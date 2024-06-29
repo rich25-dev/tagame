@@ -8,15 +8,24 @@ let gameStarted = false;
 let score = 0;
 let obstacles = [];
 
+// Add event listeners for both keydown and touchstart events
 document.addEventListener('keydown', function(event) {
     if (event.code === 'Space') {
-        if (!gameStarted) {
-            startGame();
-        } else if (!isJumping) {
-            jump();
-        }
+        handleStartOrJump();
     }
 });
+
+document.addEventListener('touchstart', function() {
+    handleStartOrJump();
+});
+
+function handleStartOrJump() {
+    if (!gameStarted) {
+        startGame();
+    } else if (!isJumping) {
+        jump();
+    }
+}
 
 function startGame() {
     gameStarted = true;
@@ -68,8 +77,9 @@ function checkCollision() {
     obstacles.forEach(obstacle => {
         const obstacleRight = parseInt(window.getComputedStyle(obstacle).right);
         if (obstacleRight > 580 && obstacleRight < 620 && dinoBottom < 40) {
-            alert('Game Over! Get It Right!!!');
+            alert('Game Over');
             window.location.reload();
         }
     });
 }
+
