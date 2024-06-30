@@ -1,85 +1,28 @@
-const dino = document.getElementById('dino');
-const startScreen = document.getElementById('startScreen');
-const gameContainer = document.getElementById('gameContainer');
-const scoreElement = document.getElementById('score');
+const symbols = ['🔥', '👕', '🐢', '⭐', '🎉'];
+const reels = [
+    document.getElementById('reel1'),
+    document.getElementById('reel2'),
+    document.getElementById('reel3')
+];
+const spinButton = document.getElementById('spinButton');
+const resultDisplay = document.getElementById('result');
 
-let isJumping = false;
-let gameStarted = false;
-let score = 0;
-let obstacles = [];
+spinButton.addEventListener('click', spinReels);
 
-// Add event listeners for both keydown and touchstart events
-document.addEventListener('keydown', function(event) {
-    if (event.code === 'Space') {
-        handleStartOrJump();
+function spinReels() {
+    let result = [];
+    for (let i = 0; i < reels.length; i++) {
+        const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+        reels[i].textContent = randomSymbol;
+        result.push(randomSymbol);
     }
-});
+    checkResult(result);
+}
 
-document.addEventListener('touchstart', function() {
-    handleStartOrJump();
-});
-
-function handleStartOrJump() {
-    if (!gameStarted) {
-        startGame();
-    } else if (!isJumping) {
-        jump();
+function checkResult(result) {
+    if (result[0] === result[1] && result[1] === result[2]) {
+        resultDisplay.textContent = '🎉 You Win 10% off!🎉 Send TRT10 to @betartle';
+    } else {
+        resultDisplay.textContent = 'Try Again! Get It Right!!!';
     }
 }
-
-function startGame() {
-    gameStarted = true;
-    startScreen.style.display = 'none';
-    gameContainer.style.display = 'block';
-    createObstacles();
-    setInterval(updateScore, 100);
-    setInterval(checkCollision, 10);
-}
-
-function jump() {
-    isJumping = true;
-    let upInterval = setInterval(() => {
-        if (parseInt(window.getComputedStyle(dino).bottom) >= 150) {
-            clearInterval(upInterval);
-            let downInterval = setInterval(() => {
-                if (parseInt(window.getComputedStyle(dino).bottom) <= 0) {
-                    clearInterval(downInterval);
-                    isJumping = false;
-                }
-                dino.style.bottom = (parseInt(window.getComputedStyle(dino).bottom) - 5) + 'px';
-            }, 20);
-        }
-        dino.style.bottom = (parseInt(window.getComputedStyle(dino).bottom) + 5) + 'px';
-    }, 20);
-}
-
-function updateScore() {
-    score += 1;
-    scoreElement.innerText = `Score: ${score}`;
-}
-
-function createObstacles() {
-    setInterval(() => {
-        let obstacle = document.createElement('div');
-        obstacle.classList.add('obstacle');
-        obstacle.style.animationDuration = `${Math.random() * 3 + 1.5}s`;
-        gameContainer.appendChild(obstacle);
-        obstacles.push(obstacle);
-        setTimeout(() => {
-            gameContainer.removeChild(obstacle);
-            obstacles.shift();
-        }, 4000); // Adjust to match animation duration
-    }, 2000); // Time interval for new obstacles
-}
-
-function checkCollision() {
-    const dinoBottom = parseInt(window.getComputedStyle(dino).bottom);
-    obstacles.forEach(obstacle => {
-        const obstacleRight = parseInt(window.getComputedStyle(obstacle).right);
-        if (obstacleRight > 580 && obstacleRight < 620 && dinoBottom < 40) {
-            alert('Game Over');
-            window.location.reload();
-        }
-    });
-}
-
